@@ -5,7 +5,6 @@ import models.User
 import pl.sidor.UserAuth.exception.IncorrectEmailException
 import pl.sidor.UserAuth.exception.IncorrectIDException
 import pl.sidor.UserAuth.repository.UserRepository
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class UserServiceImplTest extends Specification {
@@ -21,27 +20,20 @@ class UserServiceImplTest extends Specification {
     def "should return User by ID"() {
         given:
         Integer id = 2
-        Role role = Role.builder()
-                .id(1)
-                .role("USER")
-                .build()
-        User user = User.builder()
-                .id(1)
-                .name("Karol")
-                .lastName("Sidor")
-                .email("karolsidor11@wp.pl")
-                .role(role)
-                .build()
+        User user = prepareUser()
 
+        userRepository.existsById(id) >> true
         userRepository.findById(id) >> Optional.of(user)
 
         when:
-        User actualUser = userService.findById(id).get()
+        Optional<User> actualUser = userService.findById(id)
         then:
-        actualUser == user
+        actualUser.isPresent()
+        actualUser.get() == user
     }
 
-    def "should return  IncorrectIDException"() {
+
+    def "should throw IncorrectIDException"() {
         given:
         Integer id = -2
         userRepository.findById(id) >> Optional.empty()
@@ -56,32 +48,20 @@ class UserServiceImplTest extends Specification {
     def "should return User by email"() {
         given:
         String email = "karolsidor11@wp.pl"
-        Role role = Role.builder()
-                .id(1)
-                .role("ADMIN")
-                .build()
+        User user = prepareUser()
+        userRepository.findByEmail(email) >> user
 
-        User user = User.builder()
-                .id(1)
-                .name("Karol")
-                .lastName("Sidor")
-                .email(email)
-                .role(role)
-                .build()
-
-        userRepository.findByEmail(email) >> Optional.of(user)
         when:
-        User actualUser = userService.findByEmail(email).get()
+        User actualUser = userService.findByEmail(email)
 
         then:
         actualUser == user
     }
 
-    @Ignore
-    def "should return IncorrectEmailException"() {
+    def "should throw IncorrectEmailException"() {
         given:
         String email = "aaaa"
-        userRepository.findByEmail(email) >> Optional.empty()
+        userRepository.findByEmail(email) >> null
 
         when:
         userService.findByEmail(email)
@@ -94,32 +74,16 @@ class UserServiceImplTest extends Specification {
     def "should return all Users"() {
         given:
         List<User> userList = new ArrayList<>()
-        Role role = Role.builder().id(1).role("USER").build()
-        User user1 = User.builder()
-                .id(1)
-                .name("Karol")
-                .lastName("Sidor")
-                .email("karolsidor11@wp.pl")
-                .role(role)
-                .build()
-        User user2 = User.builder()
-                .id(2)
-                .name("Jan")
-                .lastName("Nowak")
-                .email("jan@wp.pl")
-                .role(role)
-                .build()
 
-        userList.add(user1)
-        userList.add(user2)
+        userList.add(prepareUser())
         userRepository.findAll() >> userList
 
         when:
-        List<User> actualUsers = userService.findALL().get()
+        List<User> actualUsers = userService.findALL()
 
         then:
         !actualUsers.isEmpty()
-        actualUsers.size() == 2
+        actualUsers.size() == 1
         actualUsers == userList
     }
 
@@ -128,20 +92,56 @@ class UserServiceImplTest extends Specification {
         userRepository.findAll() >> Collections.emptyList()
 
         when:
-        List<User> actualUserList = userService.findALL().get()
+        List<User> actualUserList = userService.findALL()
 
         then:
-        actualUserList.size() == 0
         actualUserList.isEmpty()
     }
 
     def "should save  user"() {
         given:
+        User user = prepareUser()
+        userRepository.save(user) >> user
+
+        when:
+        User actualUser = userService.save(user)
+
+        then:
+        1 * userRepository.save(user)
+        
+    }
+
+    def "should  delete User by ID"() {
+        given:
+        Integer id = 1
+        userRepository.existsById(id) >> true
+        userRepository.deleteUserById(id)
+
+        when:
+        userService.deleteUser(id)
+
+        then:
+        1 * userRepository.deleteUserById(id)
+    }
+
+    def "should return IncorrectIDException"() {
+        given:
+        Integer id = 9999
+        userRepository.existsById(id) >> false
+        userRepository.deleteUserById(id)
+
+        when:
+        userService.deleteUser(id)
+
+        then:
+        thrown(IncorrectIDException)
+    }
+
+    private static User prepareUser() {
         Role role = Role.builder()
                 .id(1)
-                .role("ADMIN")
+                .role("USER")
                 .build()
-
         User user = User.builder()
                 .id(1)
                 .name("Karol")
@@ -149,13 +149,6 @@ class UserServiceImplTest extends Specification {
                 .email("karolsidor11@wp.pl")
                 .role(role)
                 .build()
-
-        userRepository.save(user) >> user
-
-        when:
-        userService.save(user)
-
-        then:
-        1 * userRepository.save(user)
+        user
     }
 }
