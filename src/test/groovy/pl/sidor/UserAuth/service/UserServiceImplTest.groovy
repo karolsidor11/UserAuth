@@ -126,8 +126,7 @@ class UserServiceImplTest extends Specification {
 
     def "should return IncorrectIDException"() {
         given:
-        Integer id = 9999
-        userRepository.existsById(id) >> false
+        Integer id = -2
         userRepository.deleteUserById(id)
 
         when:

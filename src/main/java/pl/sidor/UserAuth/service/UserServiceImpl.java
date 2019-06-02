@@ -27,7 +27,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findById(Integer id) throws IncorrectIDException {
-        validateID(id);
         return Optional.of(userRepository.findById(id).orElseThrow(IncorrectIDException::new));
     }
 
@@ -35,6 +34,12 @@ public class UserServiceImpl implements UserService {
     public User findByEmail(String email) throws IncorrectEmailException {
 
         return Optional.ofNullable(userRepository.findByEmail(email)).orElseThrow(IncorrectEmailException::new);
+    }
+
+    @Override
+    public User findByEmailAndPassword(String email, String password) {
+
+        return userRepository.findByEmailAndPassword(email, password);
     }
 
     @Override
@@ -50,7 +55,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean deleteUser(Integer id) throws IncorrectIDException {
-        validateID(id);
+        if(id<=0){
+            throw new IncorrectIDException("Nieprawidłowy identyfikator");
+        }
         userRepository.deleteUserById(id);
         return true;
     }

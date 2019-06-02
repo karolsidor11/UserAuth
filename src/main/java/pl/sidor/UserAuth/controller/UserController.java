@@ -1,13 +1,16 @@
 package pl.sidor.UserAuth.controller;
 
 import models.User;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.sidor.UserAuth.dto.UserDto;
 import pl.sidor.UserAuth.exception.IncorrectEmailException;
 import pl.sidor.UserAuth.exception.IncorrectIDException;
+import pl.sidor.UserAuth.mapper.UserMapper;
 import pl.sidor.UserAuth.service.UserService;
 
 import java.util.List;
@@ -47,8 +50,8 @@ public class UserController {
     public ResponseEntity findUserByEmail(@PathVariable String email) {
         try {
             User byEmail = userService.findByEmail(email);
-            HttpStatus httpStatus = Optional.ofNullable(userService.findByEmail(email)).isPresent() ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-            return new ResponseEntity<>(byEmail, httpStatus);
+            HttpStatus httpStatus1 = byEmail!=null? HttpStatus.OK: HttpStatus.NOT_FOUND;
+            return new ResponseEntity<>(byEmail, httpStatus1);
         } catch (IncorrectEmailException e) {
             e.printStackTrace();
             return new ResponseEntity<>(e, HttpStatus.NOT_FOUND);
@@ -77,5 +80,24 @@ public class UserController {
             e.printStackTrace();
             return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity find(@PathVariable Integer id) throws Exception {
+
+        UserMapper userMapper = new UserMapper(new ModelMapper());
+        UserDto userDto = userMapper.mapTo(userService.findById(id).get());
+
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "login/{email}/{password}")
+    public ResponseEntity<User> findByEmailAndPassword(@PathVariable String email, @PathVariable String password) {
+
+        Optional<User> byEmailAndPassword = Optional.ofNullable(userService.findByEmailAndPassword(email, password));
+
+        HttpStatus httpStatus = byEmailAndPassword.isPresent() ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+
+        return new ResponseEntity<>(byEmailAndPassword.get(), httpStatus);
     }
 }

@@ -13,6 +13,8 @@ public interface UserService {
 
     User findByEmail(String email) throws IncorrectEmailException;
 
+    User findByEmailAndPassword(String email, String password);
+
     List<User> findALL();
 
     User save(User user);
