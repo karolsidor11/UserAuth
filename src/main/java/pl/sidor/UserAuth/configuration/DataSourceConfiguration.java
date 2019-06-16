@@ -34,7 +34,7 @@ public class DataSourceConfiguration {
     private String USER_PASSWORD;
 
 
-    @Bean
+    @Bean(name = "data")
     public DataSource dataSource() {
         DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
         driverManagerDataSource.setUrl(DATEBASE_URL);
@@ -81,4 +81,5 @@ public class DataSourceConfiguration {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
+
 }

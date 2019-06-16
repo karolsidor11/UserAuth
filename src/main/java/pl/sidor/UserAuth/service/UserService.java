@@ -9,15 +9,15 @@ import java.util.Optional;
 
 public interface UserService {
 
-    Optional<User> findById(Integer id) throws Exception;
+    Optional<User> findById(Integer id) throws IncorrectIDException;
 
-    User findByEmail(String email) throws IncorrectEmailException;
+    Optional<User> findByEmail(String email) throws IncorrectEmailException;
 
-    User findByEmailAndPassword(String email, String password);
+    Optional<User> login(String email, String password);
 
     List<User> findALL();
 
-    User save(User user);
+    Optional<User> save(User user);
 
     boolean deleteUser(Integer id) throws IncorrectIDException;
 

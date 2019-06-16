@@ -30,7 +30,6 @@ public class UserController {
     public ResponseEntity<List<User>> findAllUsers() {
 
         List<User> allUsers = userService.findALL();
-
         return new ResponseEntity<>(allUsers, HttpStatus.OK);
     }
 
@@ -49,9 +48,9 @@ public class UserController {
     @GetMapping(value = "email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity findUserByEmail(@PathVariable String email) {
         try {
-            User byEmail = userService.findByEmail(email);
-            HttpStatus httpStatus1 = byEmail!=null? HttpStatus.OK: HttpStatus.NOT_FOUND;
-            return new ResponseEntity<>(byEmail, httpStatus1);
+            Optional<User> byEmail = userService.findByEmail(email);
+            HttpStatus httpStatus1 = byEmail.isPresent() ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+            return new ResponseEntity<>(byEmail.get(), httpStatus1);
         } catch (IncorrectEmailException e) {
             e.printStackTrace();
             return new ResponseEntity<>(e, HttpStatus.NOT_FOUND);
@@ -59,13 +58,14 @@ public class UserController {
     }
 
     @PostMapping(value = "save", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<User> saveUser(@RequestBody User user) {
 
-        User savedUser = userService.save(user);
+        Optional<User> savedUser = userService.save(user);
 
-        HttpStatus httpStatus = savedUser != null ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+        HttpStatus httpStatus = savedUser.isPresent() ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
 
-        return new ResponseEntity<>(savedUser, httpStatus);
+        return new ResponseEntity<>(savedUser.get(), httpStatus);
     }
 
     @DeleteMapping(value = "delete/{id}")
@@ -83,21 +83,12 @@ public class UserController {
     }
 
     @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity find(@PathVariable Integer id) throws Exception {
+    public ResponseEntity findUser(@PathVariable Integer id) throws IncorrectIDException {
 
         UserMapper userMapper = new UserMapper(new ModelMapper());
         UserDto userDto = userMapper.mapTo(userService.findById(id).get());
 
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
-
-    @PostMapping(value = "login/{email}/{password}")
-    public ResponseEntity<User> findByEmailAndPassword(@PathVariable String email, @PathVariable String password) {
-
-        Optional<User> byEmailAndPassword = Optional.ofNullable(userService.findByEmailAndPassword(email, password));
-
-        HttpStatus httpStatus = byEmailAndPassword.isPresent() ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-
-        return new ResponseEntity<>(byEmailAndPassword.get(), httpStatus);
-    }
 }
+
