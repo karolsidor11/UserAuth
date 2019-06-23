@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.sidor.UserAuth.service.UserService;
 import pl.sidor.UserAuth.token.UserToken;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 @RestController
@@ -35,7 +36,7 @@ public class LoginController {
         return UserToken.createTokenForUser(byEmailAndPassword.get());
     }
     @PostMapping("/login")
-    public String login(){
+    public String login() throws UnsupportedEncodingException {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String name = authentication.getName();
@@ -49,8 +50,8 @@ public class LoginController {
                .setSubject(name)
                .addClaims(map)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+2000))
-                .signWith(SignatureAlgorithm.HS256,"token")
+                .setExpiration(new Date(System.currentTimeMillis()+20000000))
+                .signWith(SignatureAlgorithm.HS256,"ZG)KB01hS9LsTuv".getBytes("UTF-8"))
                 .compact();
     }
 }

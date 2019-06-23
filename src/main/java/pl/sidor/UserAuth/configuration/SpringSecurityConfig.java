@@ -18,7 +18,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
        auth.inMemoryAuthentication()
                .withUser("admin").password("{noop}admin").roles("ADMIN","USER")
                .and()
-               .withUser("Karol").password("{noop}karol123").roles("USER");
+               .withUser("Karol").password("{noop}karol123").roles("USER")
+                .and()
+               .withUser("user").password("{noop}user").roles("USER");
     }
 
     @Override
@@ -34,9 +36,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers("/h2/**").permitAll()
+                .antMatchers("/save").permitAll()
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .anyRequest().authenticated().and().httpBasic();
-
 
     }
 }
