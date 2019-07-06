@@ -1,5 +1,6 @@
 package pl.sidor.UserAuth.configuration;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -33,7 +34,7 @@ public class DataSourceConfiguration {
     private String USER_PASSWORD;
 
 
-    @Bean
+    @Bean(name = "data")
     public DataSource dataSource() {
         DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
         driverManagerDataSource.setUrl(DATEBASE_URL);
@@ -75,4 +76,10 @@ public class DataSourceConfiguration {
 
         return transactionManager;
     }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
+
 }
