@@ -4,6 +4,7 @@ import pl.sidor.UserAuth.exception.IncorrectEmailException
 import pl.sidor.UserAuth.exception.IncorrectIDException
 import pl.sidor.UserAuth.repository.UserRepository
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class UserValidationTest extends Specification {
 
@@ -61,5 +62,24 @@ class UserValidationTest extends Specification {
         then:
         result == false
         thrown(IncorrectEmailException)
+    }
+
+
+    @Unroll
+    def "parametrized tests"() {
+        when:
+
+        userRepository.existsById(1) >> true
+        boolean result = userValidation.validateEmail(object)
+        boolean result1 = userValidation.validateID(numer)
+        then:
+        result == expectedResult
+        result1 == expectedResult1
+
+        where:
+
+        object               | expectedResult | numer | expectedResult1
+        "jan"                | false          | 1     | true
+        "karolsidor11@wp.pl" | true           | 2     | false
     }
 }

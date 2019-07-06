@@ -21,7 +21,8 @@ public class UserValidation {
 
     public boolean validateID(Integer id) throws IncorrectIDException {
         if (!userRepository.existsById(id)) {
-            throw new IncorrectIDException("Użytkownik o podanym ID nie istnieje w bazie !!!");
+//            throw new IncorrectIDException("Użytkownik o podanym ID nie istnieje w bazie !!!");
+            return false;
         } else {
             return true;
         }
@@ -36,7 +37,8 @@ public class UserValidation {
 
             Matcher matcher = pattern.matcher(email);
             if (!matcher.matches()) {
-                throw new IncorrectEmailException("Nieprawidłowy adress email !!!");
+//                throw new IncorrectEmailException("Nieprawidłowy adress email !!!");
+                return false;
             }
         }
         return true;

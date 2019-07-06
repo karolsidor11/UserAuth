@@ -27,14 +27,6 @@ public class LoginController {
         this.userService = userService;
     }
 
-    @GetMapping(value = "login/{name}/{password}")
-    public String loginUser(@PathVariable String name, @PathVariable String password) {
-
-
-        Optional<User> byEmailAndPassword = Optional.of(userService.login(name, password).get());
-
-        return UserToken.createTokenForUser(byEmailAndPassword.get());
-    }
     @PostMapping("/login")
     public String login() throws UnsupportedEncodingException {
 

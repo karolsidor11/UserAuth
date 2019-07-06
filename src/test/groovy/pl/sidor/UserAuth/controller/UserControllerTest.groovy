@@ -89,7 +89,7 @@ class UserControllerTest extends Specification {
                 .role(new Role(1, "USER"))
                 .build()
 
-        userService.findByEmail(email) >> user
+        userService.findByEmail(email) >> Optional.of(user)
 
         when:
         ResponseEntity<User> responseEntity = userController.findUserByEmail(email)
@@ -103,7 +103,7 @@ class UserControllerTest extends Specification {
     def "should save User in database"() {
         given:
         User user = prepareUser()
-        userService.save(user) >> user
+        userService.save(user) >> Optional.of(user)
 
         when:
         ResponseEntity responseEntity = userController.saveUser(user)

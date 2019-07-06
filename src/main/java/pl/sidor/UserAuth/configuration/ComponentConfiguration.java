@@ -3,6 +3,7 @@ package pl.sidor.UserAuth.configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.web.servlet.MockMvc;
 import pl.sidor.UserAuth.repository.UserRepository;
 import pl.sidor.UserAuth.validation.UserValidation;
 
